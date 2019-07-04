@@ -3,8 +3,6 @@ var inquirer = require("inquirer");
 var chalk = require("chalk");
 var connection = require("./connection.js");
 
-let choices = [];
-
 // make sure it's connected to my local database by a console.log
 // display items
 connection.connect(function (err) {
@@ -64,10 +62,10 @@ function viewLowInventory() {
 
 function printProducts(callback){
     connection.query("SELECT item_id, product_name, stock_quantity FROM products", function (err, res) {
-        choices = [];
+        let choices = [];
         if (err) throw err;
         for( let i = 0; i < res.length; i++) {
-            let choice = res[i].item_id + " | " + res[i].product_name + " | " + res[i].stock_quantity + " \n";
+            let choice = res[i].item_id + " | " + res[i].product_name + " | " + res[i].stock_quantity;
             choices.push(choice);
         }
         callback(choices);
@@ -79,9 +77,27 @@ function addToInventory(choices) {
         type: "list",
         message: "Add more of: ",
         name: "product",
-        choices: [choices]
+        choices: choices
+    },
+    {
+        type: "input",
+        message: "How many?: ",
+        name: "quantity"
     }]).then(function (response) {
-        console.log("yes");
+        let chosen = response.product.split(" | ");
+        let currentStock = parseInt(chosen[2]);
+        let chosenId = parseInt(chosen[0]);
+        let addedStock = parseInt(response.quantity);
+        connection.query("UPDATE products SET ? WHERE ?", [{
+            stock_quantity: currentStock + addedStock
+        },
+        {
+            item_id : chosenId
+        }], function(err){
+            if (err) throw err;
+            console.log(chalk.green.bold("Product quantity successfully updated!"));
+            promptAction();
+        });
     });
 }
 
