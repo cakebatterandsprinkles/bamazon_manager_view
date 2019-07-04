@@ -24,6 +24,6 @@
 
   * If a manager selects `Exit`, it stops the program.
 
-      ![Here is the demo](assets/first_part.gif)
+    ![Here is the demo](assets/first_part.gif)
 
-      ![Here is the demo](assets/part_two.gif)
+    ![Here is the demo](assets/part_two.gif)
